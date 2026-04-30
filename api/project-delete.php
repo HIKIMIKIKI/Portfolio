@@ -18,10 +18,15 @@ if ($id <= 0) {
     ], 422);
 }
 
-$connection = get_db_connection();
-$statement = $connection->prepare('DELETE FROM projects WHERE id = ?');
-$statement->bind_param('i', $id);
-$statement->execute();
+$response = supabase_request('DELETE', 'projects?id=eq.' . $id);
+
+if ($response['status'] >= 400) {
+    json_response([
+        'success' => false,
+        'message' => 'Could not delete project.',
+        'details' => $response['data']
+    ], $response['status']);
+}
 
 json_response([
     'success' => true,

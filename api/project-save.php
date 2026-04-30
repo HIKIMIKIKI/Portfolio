@@ -24,12 +24,25 @@ if ($title === '' || $category === '' || $description === '' || $technologies ==
     ], 422);
 }
 
-$connection = get_db_connection();
+$payload = [
+    'title' => $title,
+    'category' => $category,
+    'description' => $description,
+    'technologies' => $technologies,
+    'project_link' => $projectLink,
+    'image_url' => $imageUrl
+];
 
 if ($id > 0) {
-    $statement = $connection->prepare('UPDATE projects SET title = ?, category = ?, description = ?, technologies = ?, project_link = ?, image_url = ? WHERE id = ?');
-    $statement->bind_param('ssssssi', $title, $category, $description, $technologies, $projectLink, $imageUrl, $id);
-    $statement->execute();
+    $response = supabase_request('PATCH', 'projects?id=eq.' . $id, $payload);
+
+    if ($response['status'] >= 400) {
+        json_response([
+            'success' => false,
+            'message' => 'Could not update project.',
+            'details' => $response['data']
+        ], $response['status']);
+    }
 
     json_response([
         'success' => true,
@@ -37,9 +50,15 @@ if ($id > 0) {
     ]);
 }
 
-$statement = $connection->prepare('INSERT INTO projects (title, category, description, technologies, project_link, image_url) VALUES (?, ?, ?, ?, ?, ?)');
-$statement->bind_param('ssssss', $title, $category, $description, $technologies, $projectLink, $imageUrl);
-$statement->execute();
+$response = supabase_request('POST', 'projects', [$payload]);
+
+if ($response['status'] >= 400) {
+    json_response([
+        'success' => false,
+        'message' => 'Could not add project.',
+        'details' => $response['data']
+    ], $response['status']);
+}
 
 json_response([
     'success' => true,

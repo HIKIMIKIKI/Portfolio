@@ -2,16 +2,12 @@
 require_once __DIR__ . '/config.php';
 require_admin_login();
 
-$connection = get_db_connection();
-$projectsResult = $connection->query('SELECT id, title, category, description, technologies, project_link, image_url FROM projects ORDER BY created_at DESC');
-$projects = [];
+$response = supabase_request(
+    'GET',
+    'projects?select=id,title,category,description,technologies,project_link,image_url,created_at&order=created_at.desc'
+);
 
-if ($projectsResult) {
-    while ($row = $projectsResult->fetch_assoc()) {
-        $projects[] = $row;
-    }
-}
-
+$projects = $response['status'] < 400 ? $response['data'] : [];
 $lastLogin = $_COOKIE['last_admin_login'] ?? 'First login on this browser';
 ?>
 <!DOCTYPE html>
@@ -86,25 +82,25 @@ $lastLogin = $_COOKIE['last_admin_login'] ?? 'First login on this browser';
                         <?php foreach ($projects as $project): ?>
                             <article class="project-card" style="margin-bottom: 1rem;">
                                 <div class="project-content">
-                                    <span class="project-meta"><?= escape_html($project['category']) ?></span>
-                                    <h3><?= escape_html($project['title']) ?></h3>
-                                    <p><?= escape_html($project['description']) ?></p>
-                                    <p><strong>Tools:</strong> <?= escape_html($project['technologies']) ?></p>
+                                    <span class="project-meta"><?= escape_html($project['category'] ?? '') ?></span>
+                                    <h3><?= escape_html($project['title'] ?? '') ?></h3>
+                                    <p><?= escape_html($project['description'] ?? '') ?></p>
+                                    <p><strong>Tools:</strong> <?= escape_html($project['technologies'] ?? '') ?></p>
                                     <div class="hero-actions">
                                         <button
                                             class="button secondary edit-project-button"
                                             type="button"
-                                            data-id="<?= (int) $project['id'] ?>"
-                                            data-title="<?= escape_html($project['title']) ?>"
-                                            data-category="<?= escape_html($project['category']) ?>"
-                                            data-description="<?= escape_html($project['description']) ?>"
-                                            data-technologies="<?= escape_html($project['technologies']) ?>"
-                                            data-link="<?= escape_html($project['project_link']) ?>"
-                                            data-image="<?= escape_html($project['image_url']) ?>"
+                                            data-id="<?= (int) ($project['id'] ?? 0) ?>"
+                                            data-title="<?= escape_html($project['title'] ?? '') ?>"
+                                            data-category="<?= escape_html($project['category'] ?? '') ?>"
+                                            data-description="<?= escape_html($project['description'] ?? '') ?>"
+                                            data-technologies="<?= escape_html($project['technologies'] ?? '') ?>"
+                                            data-link="<?= escape_html($project['project_link'] ?? '') ?>"
+                                            data-image="<?= escape_html($project['image_url'] ?? '') ?>"
                                         >
                                             Edit
                                         </button>
-                                        <button class="button primary delete-project-button" type="button" data-id="<?= (int) $project['id'] ?>">Delete</button>
+                                        <button class="button primary delete-project-button" type="button" data-id="<?= (int) ($project['id'] ?? 0) ?>">Delete</button>
                                     </div>
                                 </div>
                             </article>

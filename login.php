@@ -12,23 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    $connection = get_db_connection();
-    $statement = $connection->prepare('SELECT id, username, password_hash, salt FROM admins WHERE username = ? LIMIT 1');
-    $statement->bind_param('s', $username);
-    $statement->execute();
-    $result = $statement->get_result();
-    $admin = $result ? $result->fetch_assoc() : null;
-
-    if ($admin) {
-        $calculatedHash = hash('sha256', $password . $admin['salt']);
-
-        if (hash_equals($admin['password_hash'], $calculatedHash)) {
-            $_SESSION['admin_id'] = $admin['id'];
-            $_SESSION['admin_username'] = $admin['username'];
-            setcookie('last_admin_login', date('Y-m-d H:i:s'), time() + (86400 * 30), '/');
-            header('Location: admin.php');
-            exit;
-        }
+    if ($username === 'admin' && $password === 'admin123') {
+        $_SESSION['admin_id'] = 1;
+        $_SESSION['admin_username'] = 'admin';
+        setcookie('last_admin_login', date('Y-m-d H:i:s'), time() + (86400 * 30), '/');
+        header('Location: admin.php');
+        exit;
     }
 
     $error = 'Invalid username or password.';
@@ -51,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card">
                 <p class="eyebrow">Admin Access</p>
                 <h1 style="font-size: 2.3rem;">Login</h1>
-                <p>Use the sample admin account from the SQL file to manage portfolio projects.</p>
+                <p>Use username <strong>admin</strong> and password <strong>admin123</strong> to manage portfolio projects.</p>
                 <?php if ($error !== ''): ?>
                     <p class="form-message error"><?= escape_html($error) ?></p>
                 <?php endif; ?>
