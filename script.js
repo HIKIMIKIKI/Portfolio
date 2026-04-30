@@ -26,6 +26,12 @@ const projectStatus = document.getElementById("project-status");
 const projectFilter = document.getElementById("project-filter");
 const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
+const supabaseUrl = window.SUPABASE_URL;
+const supabaseKey = window.SUPABASE_PUBLISHABLE_KEY;
+
+const supabaseClient = window.supabase && supabaseUrl && supabaseKey
+    ? window.supabase.createClient(supabaseUrl, supabaseKey)
+    : null;
 
 let projectsCache = [];
 let currentRoleIndex = 0;
@@ -123,18 +129,25 @@ function renderProjects(projects) {
 async function loadProjects() {
     projectStatus.textContent = "Loading projects from the database...";
 
-    try {
-        const response = await fetch("api/projects.php");
-        const data = await response.json();
+    if (!supabaseClient) {
+        projectStatus.textContent = "Add your Supabase URL and publishable key in supabase-config.js.";
+        return;
+    }
 
-        if (!data.success) {
-            throw new Error(data.message || "Could not load projects.");
+    try {
+        const { data, error } = await supabaseClient
+            .from("projects")
+            .select("*")
+            .order("created_at", { ascending: false });
+
+        if (error) {
+            throw error;
         }
 
-        projectsCache = data.projects;
+        projectsCache = data || [];
         applyProjectFilter();
     } catch (error) {
-        projectStatus.textContent = "Projects could not be loaded. Please check the PHP/MySQL setup.";
+        projectStatus.textContent = "Projects could not be loaded. Please check your Supabase table and policies.";
         projectList.innerHTML = "";
     }
 }
@@ -191,25 +204,34 @@ async function handleContactSubmit(event) {
         return;
     }
 
-    const formData = new FormData(contactForm);
+    if (!supabaseClient) {
+        formMessage.textContent = "Add your Supabase URL and publishable key in supabase-config.js.";
+        formMessage.classList.add("error");
+        return;
+    }
+
+    const formValues = {
+        name: document.getElementById("name").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        reason: document.getElementById("reason").value.trim(),
+        subject: document.getElementById("subject").value.trim(),
+        message: document.getElementById("message").value.trim()
+    };
 
     try {
-        const response = await fetch(contactForm.action, {
-            method: "POST",
-            body: formData
-        });
+        const { error } = await supabaseClient
+            .from("messages")
+            .insert([formValues]);
 
-        const data = await response.json();
-
-        if (!data.success) {
-            throw new Error(data.message || "Message could not be sent.");
+        if (error) {
+            throw error;
         }
 
-        formMessage.textContent = data.message;
+        formMessage.textContent = "Your message was sent successfully.";
         formMessage.classList.add("success");
         contactForm.reset();
     } catch (error) {
-        formMessage.textContent = error.message;
+        formMessage.textContent = error.message || "Message could not be sent.";
         formMessage.classList.add("error");
     }
 }

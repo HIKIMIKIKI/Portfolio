@@ -35,10 +35,10 @@
             <div class="container hero-grid">
                 <div class="hero-copy">
                     <p class="eyebrow">Full-Stack Web Portfolio</p>
-                    <h1>Hi, I am Eldar, a computer science student building practical web projects.</h1>
+                    <h1>Hi, I am Aysel, a computer science student building practical web projects.</h1>
                     <p class="hero-role">Current focus: <span id="changing-role">Responsive Web Design</span></p>
                     <p class="hero-text">
-                        This portfolio shows the frontend and backend topics I learned this semester using HTML, CSS, JavaScript, PHP, and MySQL.
+                        This portfolio shows the frontend and backend topics I learned this semester using HTML, CSS, JavaScript, and database integration with Supabase.
                     </p>
                     <div class="hero-actions">
                         <a class="button primary" href="#projects">View My Projects</a>
@@ -144,8 +144,8 @@
                             <li>Semantic HTML structure</li>
                             <li>Responsive CSS with Flexbox and Grid</li>
                             <li>JavaScript validation and DOM updates</li>
-                            <li>PHP form handling and sessions</li>
-                            <li>MySQL storage for projects and messages</li>
+                            <li>Database-driven content using Supabase</li>
+                            <li>Contact form storage in the cloud database</li>
                             <li>AJAX loading using the Fetch API</li>
                         </ul>
                     </div>
@@ -162,21 +162,14 @@
                 <div class="contact-grid">
                     <article class="card">
                         <h3>Why contact me?</h3>
-                        <p>
-                        I’m a full stack developer with a strong interest in building scalable, user-focused applications across both front-end and back-end environments.
-                        </p>
-
-                        <p>
-                        I’m currently open to internships, student collaborations, and entry-level freelance opportunities where I can contribute to real-world projects, expand my technical skill set, and collaborate with other developers, designers, and entrepreneurs. I’m particularly interested in environments that encourage learning, mentorship, and hands-on problem solving, and I’m always eager to explore new technologies and best practices in software development.
-                        </p>
+                        <p>I am open to internships, student collaborations, and beginner freelance opportunities.</p>
                         <div class="contact-points">
-
                             <p><strong>Email:</strong> aysel.student@example.com</p>
                             <p><strong>Location:</strong> Istanbul, Turkey</p>
                             <p><strong>Response Time:</strong> Usually within 1 to 2 days</p>
                         </div>
                     </article>
-                    <form id="contact-form" class="card contact-form" action="api/contact.php" method="post" novalidate>
+                    <form id="contact-form" class="card contact-form" novalidate>
                         <label for="name">Name</label>
                         <input type="text" id="name" name="name" placeholder="Enter your name">
 
@@ -208,11 +201,13 @@
 
     <footer class="site-footer">
         <div class="container footer-content">
-            <p>&copy; <span id="year"></span> Eldar Ibrahimli Student Portfolio</p>
-            <p>Built with HTML, CSS, JavaScript, PHP, and MySQL</p>
+            <p>&copy; <span id="year"></span> Eldar Student Portfolio</p>
+            <p>Built with HTML, CSS, JavaScript, and Supabase</p>
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
