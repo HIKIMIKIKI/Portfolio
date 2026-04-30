@@ -4,7 +4,7 @@ const skills = [
     "JavaScript",
     "Responsive Design",
     "PHP",
-    "MySQL",
+    "Supabase",
     "AJAX",
     "Session Management"
 ];
@@ -13,7 +13,7 @@ const rotatingRoles = [
     "Responsive Web Design",
     "JavaScript Form Validation",
     "PHP CRUD Systems",
-    "MySQL Database Integration"
+    "Supabase Database Integration"
 ];
 
 const navLinks = document.getElementById("nav-links");
@@ -26,12 +26,6 @@ const projectStatus = document.getElementById("project-status");
 const projectFilter = document.getElementById("project-filter");
 const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
-const supabaseUrl = window.SUPABASE_URL;
-const supabaseKey = window.SUPABASE_PUBLISHABLE_KEY;
-
-const supabaseClient = window.supabase && supabaseUrl && supabaseKey
-    ? window.supabase.createClient(supabaseUrl, supabaseKey)
-    : null;
 
 let projectsCache = [];
 let currentRoleIndex = 0;
@@ -129,25 +123,18 @@ function renderProjects(projects) {
 async function loadProjects() {
     projectStatus.textContent = "Loading projects from the database...";
 
-    if (!supabaseClient) {
-        projectStatus.textContent = "Add your Supabase URL and publishable key in supabase-config.js.";
-        return;
-    }
-
     try {
-        const { data, error } = await supabaseClient
-            .from("projects")
-            .select("*")
-            .order("created_at", { ascending: false });
+        const response = await fetch("api/projects.php");
+        const data = await response.json();
 
-        if (error) {
-            throw error;
+        if (!data.success) {
+            throw new Error(data.message || "Could not load projects.");
         }
 
-        projectsCache = data || [];
+        projectsCache = data.projects || [];
         applyProjectFilter();
     } catch (error) {
-        projectStatus.textContent = "Projects could not be loaded. Please check your Supabase table and policies.";
+        projectStatus.textContent = "Projects could not be loaded. Please check the PHP to Supabase connection.";
         projectList.innerHTML = "";
     }
 }
@@ -204,30 +191,21 @@ async function handleContactSubmit(event) {
         return;
     }
 
-    if (!supabaseClient) {
-        formMessage.textContent = "Add your Supabase URL and publishable key in supabase-config.js.";
-        formMessage.classList.add("error");
-        return;
-    }
-
-    const formValues = {
-        name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        reason: document.getElementById("reason").value.trim(),
-        subject: document.getElementById("subject").value.trim(),
-        message: document.getElementById("message").value.trim()
-    };
+    const formData = new FormData(contactForm);
 
     try {
-        const { error } = await supabaseClient
-            .from("messages")
-            .insert([formValues]);
+        const response = await fetch("api/contact.php", {
+            method: "POST",
+            body: formData
+        });
 
-        if (error) {
-            throw error;
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message || "Message could not be sent.");
         }
 
-        formMessage.textContent = "Your message was sent successfully.";
+        formMessage.textContent = data.message;
         formMessage.classList.add("success");
         contactForm.reset();
     } catch (error) {

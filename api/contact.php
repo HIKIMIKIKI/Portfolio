@@ -21,10 +21,21 @@ if (strlen($name) < 2 || !filter_var($email, FILTER_VALIDATE_EMAIL) || $reason =
     ], 422);
 }
 
-$connection = get_db_connection();
-$statement = $connection->prepare('INSERT INTO messages (name, email, reason, subject, message) VALUES (?, ?, ?, ?, ?)');
-$statement->bind_param('sssss', $name, $email, $reason, $subject, $message);
-$statement->execute();
+$response = supabase_request('POST', 'messages', [[
+    'name' => $name,
+    'email' => $email,
+    'reason' => $reason,
+    'subject' => $subject,
+    'message' => $message
+]]);
+
+if ($response['status'] >= 400) {
+    json_response([
+        'success' => false,
+        'message' => 'Could not save your message to Supabase.',
+        'details' => $response['data']
+    ], $response['status']);
+}
 
 json_response([
     'success' => true,
