@@ -24,7 +24,7 @@ $lastLogin = $_COOKIE['last_admin_login'] ?? 'First login on this browser';
 <body>
     <header class="site-header">
         <nav class="navbar container">
-            <a class="brand" href="index.html">Aysel <span>Portfolio</span></a>
+            <a class="brand" href="index.html">Eldar Ibrahimli <span>Portfolio</span></a>
             <div class="hero-actions">
                 <a class="button secondary" href="index.html">View Site</a>
                 <a class="button primary" href="logout.php">Logout</a>

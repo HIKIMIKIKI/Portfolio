@@ -18,12 +18,16 @@ body.dark-theme {
     --surface-strong: #283845;
     --text: #f4f7fb;
     --muted: #c0cad5;
-    --accent: #f1a35d;
-    --accent-dark: #ffbe83;
+    --accent: #124878;
+    --accent-dark: #ffffff;
     --line: #344758;
     --success: #84e3ac;
     --error: #ff9b91;
     --shadow: 0 20px 45px rgba(0, 0, 0, 0.3);
+    background:
+        radial-gradient(circle at top left, rgba(69, 43, 18, 0.4), transparent 34%),
+        linear-gradient(180deg, rgba(10, 15, 20, 0.78), transparent 42%),
+        var(--bg);
 }
 
 * {
@@ -499,6 +503,8 @@ textarea {
         padding: 0.7rem;
     }
 }
+
+
 
 
 
