@@ -34,9 +34,25 @@ function initializeYear() {
     document.getElementById("year").textContent = new Date().getFullYear();
 }
 
+function closeMenu() {
+    navLinks.classList.remove("open");
+    menuToggle.setAttribute("aria-expanded", "false");
+}
+
 function initializeMenu() {
     menuToggle.addEventListener("click", () => {
-        navLinks.classList.toggle("open");
+        const isOpen = navLinks.classList.toggle("open");
+        menuToggle.setAttribute("aria-expanded", String(isOpen));
+    });
+
+    navLinks.querySelectorAll("a").forEach((link) => {
+        link.addEventListener("click", closeMenu);
+    });
+
+    window.addEventListener("resize", () => {
+        if (window.innerWidth > 760) {
+            closeMenu();
+        }
     });
 }
 
@@ -224,3 +240,8 @@ document.addEventListener("DOMContentLoaded", () => {
     projectFilter.addEventListener("change", applyProjectFilter);
     contactForm.addEventListener("submit", handleContactSubmit);
 });
+
+
+
+
+
